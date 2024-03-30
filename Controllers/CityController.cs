@@ -1,12 +1,10 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Dotnet_Api.Data;
+using AutoMapper;
+using Dotnet_Api.Dtos;
+using Dotnet_Api.Interfaces;
 using Dotnet_Api.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+
 
 namespace Dotnet_Api.Controllers
 {
@@ -14,48 +12,55 @@ namespace Dotnet_Api.Controllers
     [Route("api/[controller]")]
     public class CityController : ControllerBase
     {
-        private readonly DataContext _dc;
+        private readonly IUnitOfWork _uow;
+        private readonly IMapper _mapper;
 
-        public CityController(DataContext dc)
+        public CityController(IUnitOfWork uow, IMapper mapper)
         {
-            _dc = dc;
+            _uow = uow;
+            _mapper = mapper;
         }
 
 
         [HttpGet]
         public async Task<IActionResult> GetCities(){
-            var cities = await  _dc.Cities.ToListAsync();
-            return Ok(cities);
+            var cities = await _uow.CityRepository.GetCitiesAsync();
+            // var citiesDto= cities.Select(x=>new CityDto{Id=x.Id, Name=x.Name});
+            var citiesDto= _mapper.Map<IEnumerable<CityDto>>(cities);
+            return Ok(citiesDto);
         }
 
       
+        [HttpPost]
         [HttpPost("post")]
-        public async Task<IActionResult> AddCity(City city)
+        public async Task<IActionResult> AddCity(CityDto cityDto)
         {
-            // City city= new City(){Name=cityName};
-            await _dc.Cities.AddAsync(city);
-            await _dc.SaveChangesAsync();
-            return Ok(city);
+            // var city= new City{Name=cityDto.Name, LastUpdatedBy=1, LastUpdatedOn=DateTime.UtcNow};
+            var city = _mapper.Map<City>(cityDto);
+            city.LastUpdatedBy=1; city.LastUpdatedOn=DateTime.UtcNow;
+            _uow.CityRepository.AddCity(city);
+            await _uow.SaveAsync();
+            return StatusCode(201);
         }
         
-        [HttpPost("add")]
-        [HttpPost("add/{cityName}")]
-        public async Task<IActionResult> AddCity(string cityName)
-        {
-            City city= new City(){Name=cityName};
-            await _dc.Cities.AddAsync(city);
-            await _dc.SaveChangesAsync();
-            return Ok(city);
-        }
+        // [HttpPost("add")]
+        // [HttpPost("add/{cityName}")]
+        // public async Task<IActionResult> AddCity(string cityName)
+        // {
+        //     City city= new City(){Name=cityName};
+        //     await _dc.Cities.AddAsync(city);
+        //     await _dc.SaveChangesAsync();
+        //     return Ok(city);
+        // }
 
         [HttpDelete("delete/{id}")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCity(int id)
         {
-            var city= await _dc.Cities.FindAsync(id);
-            _dc.Cities.Remove(city);
-            await _dc.SaveChangesAsync();
-            return Ok(city);
+            _uow.CityRepository.DeleteCity(id);
+        
+            await _uow.SaveAsync();
+            return Ok(id);
         }
     }
 }
