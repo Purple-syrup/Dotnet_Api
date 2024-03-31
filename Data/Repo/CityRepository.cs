@@ -28,5 +28,10 @@ namespace Dotnet_Api.Data.Repo
             return await _dc.Cities.ToListAsync();
         }
 
+        public async Task<City> FindCity(int cityId)
+        {
+            return await _dc.Cities.FindAsync(cityId);
+            
+        }
     }
 }

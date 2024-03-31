@@ -10,5 +10,7 @@ namespace Dotnet_Api.Interfaces
 
         void DeleteCity(int cityId);
 
+        Task<City> FindCity(int cityId);
+
     }
 }

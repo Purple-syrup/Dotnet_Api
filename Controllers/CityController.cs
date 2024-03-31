@@ -2,6 +2,7 @@ using AutoMapper;
 using Dotnet_Api.Dtos;
 using Dotnet_Api.Interfaces;
 using Dotnet_Api.Models;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -51,6 +52,28 @@ namespace Dotnet_Api.Controllers
         //     await _dc.SaveChangesAsync();
         //     return Ok(city);
         // }
+
+        [HttpPut("update/{id:int}")]
+        [HttpPut("{Id:int}")]
+        public async Task<IActionResult> UpdateCity(int Id,CityDto cityDto)
+        {
+            var dbCity=await _uow.CityRepository.FindCity(Id);
+            dbCity.LastUpdatedBy=1;dbCity.LastUpdatedOn=DateTime.UtcNow;
+            _mapper.Map(cityDto,dbCity);
+            await _uow.SaveAsync();
+            return StatusCode(200); 
+        }
+
+        [HttpPatch("update/{id:int}")]
+        [HttpPatch("{Id:int}")]
+        public async Task<IActionResult> UpdateCityPatch(int Id,JsonPatchDocument<City> city)
+        {
+            var dbCity=await _uow.CityRepository.FindCity(Id);
+            dbCity.LastUpdatedBy=1;dbCity.LastUpdatedOn=DateTime.UtcNow;
+            city.ApplyTo(dbCity,ModelState);
+            await _uow.SaveAsync();
+            return StatusCode(200); 
+        }
 
         [HttpDelete("delete/{id}")]
         [HttpDelete("{id}")]
