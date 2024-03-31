@@ -1,4 +1,3 @@
-using System.Linq;
 using AutoMapper;
 using Dotnet_Api.Dtos;
 using Dotnet_Api.Interfaces;
