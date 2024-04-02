@@ -1,4 +1,6 @@
 
+using System.ComponentModel.DataAnnotations;
+
 namespace Dotnet_Api.Models
 {
     public class City
@@ -7,7 +9,8 @@ namespace Dotnet_Api.Models
         public int Id { get; set; }
 
         public string Name { get; set; }
-
+        
+        [Required]
         public string Country { get; set; }
 
         public DateTime LastUpdatedOn {get;set;}
