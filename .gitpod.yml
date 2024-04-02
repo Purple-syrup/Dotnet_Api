@@ -4,10 +4,13 @@ image:
 tasks:
   - name: Restore & Build
     init: |
-      dotnet dev-certs https 
+      dotnet dev-certs https
+      dotnet Restore
+      dotnet tool install --global dotnet-ef
+
       
   - name: Run
-    command: dotnet --version
+    command: export PATH="$PATH:/home/gitpod/.dotnet/tools"
 
 vscode:
   extensions:
