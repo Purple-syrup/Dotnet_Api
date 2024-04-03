@@ -24,6 +24,7 @@ namespace Dotnet_Api.Controllers
 
         [HttpGet]
         public async Task<IActionResult> GetCities(){
+            throw new UnauthorizedAccessException();
             var cities = await _uow.CityRepository.GetCitiesAsync();
             // var citiesDto= cities.Select(x=>new CityDto{Id=x.Id, Name=x.Name});
             var citiesDto= _mapper.Map<IEnumerable<CityDto>>(cities);
@@ -53,15 +54,29 @@ namespace Dotnet_Api.Controllers
         //     return Ok(city);
         // }
 
-        [HttpPut("update/{id:int}")]
+        [HttpPut("update/{Id:int}")]
         [HttpPut("{Id:int}")]
         public async Task<IActionResult> UpdateCity(int Id,CityDto cityDto)
         {
+            // try{
+
+            if(Id != cityDto.Id)
+            {
+                return BadRequest("Update Not Allowed");
+            }
             var dbCity=await _uow.CityRepository.FindCity(Id);
+            if(dbCity ==null){
+                return BadRequest("Update Not Allowed");
+            }
             dbCity.LastUpdatedBy=1;dbCity.LastUpdatedOn=DateTime.UtcNow;
             _mapper.Map(cityDto,dbCity);
+
+            throw new Exception("Unknown Error Occured");
             await _uow.SaveAsync();
             return StatusCode(200); 
+            // }catch {
+            //     return StatusCode(500,"Unknown Error Occured");
+            // }
         }
 
         [HttpPatch("update/{id:int}")]
