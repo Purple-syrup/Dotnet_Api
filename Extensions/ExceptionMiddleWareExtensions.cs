@@ -1,12 +1,13 @@
 
 using System.Net;
+using Dotnet_Api.Middlewares;
 using Microsoft.AspNetCore.Diagnostics;
 
 namespace Dotnet_Api.Extensions
 {
     public static class ExceptionMiddleWareExtensions
     {
-        public static void ConfigureExceptionHandler(this IApplicationBuilder app, IWebHostEnvironment env)
+        public static void ConfigureBuiltinExceptionHandler(this IApplicationBuilder app, IWebHostEnvironment env)
         {
             // app.UseDeveloperExceptionPage();
             // Configure the HTTP request pipeline.
@@ -36,5 +37,10 @@ namespace Dotnet_Api.Extensions
             }
 
         }
+        public static void ConfigureExceptionHandler(this IApplicationBuilder app,IWebHostEnvironment env)
+        {
+            app.UseMiddleware<ExceptionMiddleware>();
+        }
     }
+
 }

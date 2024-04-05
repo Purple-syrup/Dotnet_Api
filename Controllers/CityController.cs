@@ -2,15 +2,15 @@ using AutoMapper;
 using Dotnet_Api.Dtos;
 using Dotnet_Api.Interfaces;
 using Dotnet_Api.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 
 namespace Dotnet_Api.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class CityController : ControllerBase
+    [Authorize]
+    public class CityController : BaseController
     {
         private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
@@ -23,8 +23,9 @@ namespace Dotnet_Api.Controllers
 
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetCities(){
-            throw new UnauthorizedAccessException();
+            // throw new UnauthorizedAccessException();
             var cities = await _uow.CityRepository.GetCitiesAsync();
             // var citiesDto= cities.Select(x=>new CityDto{Id=x.Id, Name=x.Name});
             var citiesDto= _mapper.Map<IEnumerable<CityDto>>(cities);
@@ -71,7 +72,7 @@ namespace Dotnet_Api.Controllers
             dbCity.LastUpdatedBy=1;dbCity.LastUpdatedOn=DateTime.UtcNow;
             _mapper.Map(cityDto,dbCity);
 
-            throw new Exception("Unknown Error Occured");
+            // throw new Exception("Unknown Error Occured");
             await _uow.SaveAsync();
             return StatusCode(200); 
             // }catch {
