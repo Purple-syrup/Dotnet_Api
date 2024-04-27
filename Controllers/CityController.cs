@@ -24,27 +24,28 @@ namespace Dotnet_Api.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> GetCities(){
+        public async Task<IActionResult> GetCities()
+        {
             // throw new UnauthorizedAccessException();
             var cities = await _uow.CityRepository.GetCitiesAsync();
             // var citiesDto= cities.Select(x=>new CityDto{Id=x.Id, Name=x.Name});
-            var citiesDto= _mapper.Map<IEnumerable<CityDto>>(cities);
+            var citiesDto = _mapper.Map<IEnumerable<CityDto>>(cities);
             return Ok(citiesDto);
         }
 
-      
+
         [HttpPost]
         [HttpPost("post")]
         public async Task<IActionResult> AddCity(CityDto cityDto)
         {
             // var city= new City{Name=cityDto.Name, LastUpdatedBy=1, LastUpdatedOn=DateTime.UtcNow};
             var city = _mapper.Map<City>(cityDto);
-            city.LastUpdatedBy=1; city.LastUpdatedOn=DateTime.UtcNow;
+            city.LastUpdatedBy = 1; city.LastUpdatedOn = DateTime.UtcNow;
             _uow.CityRepository.AddCity(city);
             await _uow.SaveAsync();
             return StatusCode(201);
         }
-        
+
         // [HttpPost("add")]
         // [HttpPost("add/{cityName}")]
         // public async Task<IActionResult> AddCity(string cityName)
@@ -57,24 +58,25 @@ namespace Dotnet_Api.Controllers
 
         [HttpPut("update/{Id:int}")]
         [HttpPut("{Id:int}")]
-        public async Task<IActionResult> UpdateCity(int Id,CityDto cityDto)
+        public async Task<IActionResult> UpdateCity(int Id, CityDto cityDto)
         {
             // try{
 
-            if(Id != cityDto.Id)
+            if (Id != cityDto.Id)
             {
                 return BadRequest("Update Not Allowed");
             }
-            var dbCity=await _uow.CityRepository.FindCity(Id);
-            if(dbCity ==null){
+            var dbCity = await _uow.CityRepository.FindCity(Id);
+            if (dbCity == null)
+            {
                 return BadRequest("Update Not Allowed");
             }
-            dbCity.LastUpdatedBy=1;dbCity.LastUpdatedOn=DateTime.UtcNow;
-            _mapper.Map(cityDto,dbCity);
+            dbCity.LastUpdatedBy = 1; dbCity.LastUpdatedOn = DateTime.UtcNow;
+            _mapper.Map(cityDto, dbCity);
 
             // throw new Exception("Unknown Error Occured");
             await _uow.SaveAsync();
-            return StatusCode(200); 
+            return StatusCode(200);
             // }catch {
             //     return StatusCode(500,"Unknown Error Occured");
             // }
@@ -82,13 +84,13 @@ namespace Dotnet_Api.Controllers
 
         [HttpPatch("update/{id:int}")]
         [HttpPatch("{Id:int}")]
-        public async Task<IActionResult> UpdateCityPatch(int Id,JsonPatchDocument<City> city)
+        public async Task<IActionResult> UpdateCityPatch(int Id, JsonPatchDocument<City> city)
         {
-            var dbCity=await _uow.CityRepository.FindCity(Id);
-            dbCity.LastUpdatedBy=1;dbCity.LastUpdatedOn=DateTime.UtcNow;
-            city.ApplyTo(dbCity,ModelState);
+            var dbCity = await _uow.CityRepository.FindCity(Id);
+            dbCity.LastUpdatedBy = 1; dbCity.LastUpdatedOn = DateTime.UtcNow;
+            city.ApplyTo(dbCity, ModelState);
             await _uow.SaveAsync();
-            return StatusCode(200); 
+            return StatusCode(200);
         }
 
         [HttpDelete("delete/{id}")]
@@ -96,7 +98,7 @@ namespace Dotnet_Api.Controllers
         public async Task<IActionResult> DeleteCity(int id)
         {
             _uow.CityRepository.DeleteCity(id);
-        
+
             await _uow.SaveAsync();
             return Ok(id);
         }

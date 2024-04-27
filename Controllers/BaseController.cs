@@ -6,6 +6,6 @@ namespace Dotnet_Api.Controllers
     [Route("api/[controller]")]
     public class BaseController : ControllerBase
     {
-        
+
     }
 }

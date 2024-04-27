@@ -20,7 +20,7 @@ namespace Dotnet_Api.Controllers
         private readonly IUnitOfWork _uow;
         private readonly IConfiguration _config;
 
-        public AccountController(IUnitOfWork uow,IConfiguration config)
+        public AccountController(IUnitOfWork uow, IConfiguration config)
         {
             _config = config;
             _uow = uow;
@@ -29,54 +29,55 @@ namespace Dotnet_Api.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginReqDto loginReq)
         {
-            var user = await _uow.UserRepository.Authenticate(loginReq.Username,loginReq.Password);
-            if (user== null)
+            var user = await _uow.UserRepository.Authenticate(loginReq.Username, loginReq.Password);
+            if (user == null)
             {
                 return Unauthorized();
             }
 
-            var loginRes= new LoginResDto();
-            loginRes.Username=user.Username; loginRes.Token=CreateJwt(user);
+            var loginRes = new LoginResDto();
+            loginRes.Username = user.Username; loginRes.Token = CreateJwt(user);
 
             return Ok(loginRes);
         }
 
         [HttpPost("register")]
         [HttpPost]
-        public async Task<IActionResult> Register([FromBody]LoginReqDto data)
+        public async Task<IActionResult> Register([FromBody] LoginReqDto data)
         {
-            _uow.UserRepository.Register(data.Username,data.Password);
-            var res=await _uow.SaveAsync();
+            _uow.UserRepository.Register(data.Username, data.Password);
+            var res = await _uow.SaveAsync();
             return Ok();
         }
 
         [HttpGet("users")]
         public async Task<IActionResult> GetUsers()
         {
-            var users=await _uow.UserRepository.GetUsers();
+            var users = await _uow.UserRepository.GetUsers();
             return Ok(users);
         }
 
         private string CreateJwt(User user)
         {
-            var secretKey=_config.GetSection("Jwt:Key").Value;
+            var secretKey = _config.GetSection("Jwt:Key").Value;
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
 
-            var claims= new Claim[]{
+            var claims = new Claim[]{
                 new Claim(ClaimTypes.Name,user.Username),
-                new Claim(ClaimTypes.NameIdentifier,user.Id.ToString())               
+                new Claim(ClaimTypes.NameIdentifier,user.Id.ToString())
             };
 
-            var signingCredentials= new SigningCredentials(
-                key,SecurityAlgorithms.HmacSha256Signature);
+            var signingCredentials = new SigningCredentials(
+                key, SecurityAlgorithms.HmacSha256Signature);
 
-            var tokenDescriptor= new SecurityTokenDescriptor {
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
                 Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.AddMinutes(2),
-                SigningCredentials=signingCredentials
+                SigningCredentials = signingCredentials
             };
 
-            var tokenHandler= new JwtSecurityTokenHandler();
+            var tokenHandler = new JwtSecurityTokenHandler();
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
