@@ -15,7 +15,7 @@ namespace Dotnet_Api.Data
 
         public ICityRepository CityRepository => new CityRepository(_dc);
 
-        public IUserRepository UserRepository =>  new UserRepository(_dc);
+        public IUserRepository UserRepository => new UserRepository(_dc);
 
         public async Task<bool> SaveAsync()
         {

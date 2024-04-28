@@ -30,13 +30,16 @@ namespace Dotnet_Api.Controllers
         public async Task<IActionResult> Login(LoginReqDto loginReq)
         {
             var user = await _uow.UserRepository.Authenticate(loginReq.Username, loginReq.Password);
-            if (user == null)
+            if (user == null || user.PasswordKey == null)
             {
                 return Unauthorized();
             }
 
-            var loginRes = new LoginResDto();
-            loginRes.Username = user.Username; loginRes.Token = CreateJwt(user);
+            var loginRes = new LoginResDto
+            {
+                Username = user.Username,
+                Token = CreateJwt(user)
+            };
 
             return Ok(loginRes);
         }
@@ -45,9 +48,10 @@ namespace Dotnet_Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Register([FromBody] LoginReqDto data)
         {
+            if (await _uow.UserRepository.UserAlreadyExists(data.Username)) return BadRequest("User Already Exists. Try Another!");
             _uow.UserRepository.Register(data.Username, data.Password);
             var res = await _uow.SaveAsync();
-            return Ok();
+            return Created();
         }
 
         [HttpGet("users")]
@@ -60,7 +64,7 @@ namespace Dotnet_Api.Controllers
         private string CreateJwt(User user)
         {
             var secretKey = _config.GetSection("Jwt:Key").Value;
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!));
 
             var claims = new Claim[]{
                 new Claim(ClaimTypes.Name,user.Username),

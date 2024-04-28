@@ -19,7 +19,7 @@ namespace Dotnet_Api.Data.Repo
 
         public void DeleteCity(int cityId)
         {
-            var city= _dc.Cities.Find(cityId);
+            var city = _dc.Cities.Find(cityId);
             _dc.Cities.Remove(city);
         }
 
@@ -31,7 +31,7 @@ namespace Dotnet_Api.Data.Repo
         public async Task<City> FindCity(int cityId)
         {
             return await _dc.Cities.FindAsync(cityId);
-            
+
         }
     }
 }

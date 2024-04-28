@@ -4,9 +4,9 @@ namespace Dotnet_Api.Interfaces
 {
     public interface IUnitOfWork
     {
-        ICityRepository CityRepository {get;}
+        ICityRepository CityRepository { get; }
 
-        IUserRepository UserRepository {get;}
+        IUserRepository UserRepository { get; }
 
         Task<bool> SaveAsync();
     }

@@ -10,8 +10,8 @@ namespace Dotnet_Api.Migrations
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
-        {   
-            
+        {
+
             migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new

@@ -37,7 +37,7 @@ namespace Dotnet_Api.Extensions
             }
 
         }
-        public static void ConfigureExceptionHandler(this IApplicationBuilder app,IWebHostEnvironment env)
+        public static void ConfigureExceptionHandler(this IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseMiddleware<ExceptionMiddleware>();
         }
