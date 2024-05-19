@@ -3,15 +3,14 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Dotnet_Api.Models
 {
-    public class User
+    public class User:BaseEntity
     {
-        public int Id { get; set; }
 
         [Required]
-        public string Username { get; set; }
+        public required string Username { get; set; }
 
         [Required]
-        public byte[] Password { get; set; }
-        public byte[] PasswordKey { get; set; }
+        public required byte[] Password { get; set; }
+        public required byte[] PasswordKey { get; set; }
     }
 }
